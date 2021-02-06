@@ -69,8 +69,6 @@ def main():
             longBreak=int(input())*60
             print('Enter cycle: ', end='')
             cycle=int(input())
-
-            startPomodoro(time, repeat, shortBreak, longBreak, cycle)
     else:
         try:
             opt, val = getopt.getopt(sys.argv[1:], "h:t:r:s:l:c:", ("help", "time", "repeat", "short-break", "long-break", "cycle"))
@@ -87,9 +85,9 @@ def main():
                     longBreak = int(v)*60
                 if o in ('-c', '--cycle'):
                     cycle = int(v)
-            startPomodoro(time, repeat, shortBreak, longBreak, cycle)
         except:
             usage()
+    startPomodoro(time, repeat, shortBreak, longBreak, cycle)
 
 if __name__ == "__main__":
     main()
