@@ -6,7 +6,7 @@ import threading
 
 def usage():
     a = '''
-        Pomodoro in Commandline
+        Pomodoro in Command line
 -h --help           Show this help dialog
 -t --time           The time for one Pomodoro
 -r --repeat         The repeat time for one long break
@@ -22,6 +22,12 @@ By defaut:
     cycle       :   3   cycle'''
 
     print(a)
+
+def pomodoro(time):
+    pass
+
+def breakTime(time):
+    pass
 
 def startPomodoro(time, repeat, shortBreak, longBreak, cycle):
     noti = ToastNotifier()
