@@ -2,7 +2,24 @@ from win10toast import ToastNotifier
 from time import sleep
 import sys, getopt
 from getpass import getuser
-import threading
+from os import path
+from datetime import timedelta
+
+def progressBar (iteration, total, prefix = '', suffix = ''):
+    length = 50
+    fill = '█'
+    printEnd = "\r"
+    percent = ("{0:.2f}").format(100 * (iteration / float(total)))
+    filledLength = int(length * iteration // total)
+    bar = fill * filledLength + '.' * (length - filledLength)
+    print(f'\r{prefix} |{bar}| {percent}% {suffix}', end = printEnd)
+    if iteration == total: 
+        print(f'{prefix} |{bar}| {percent}% {suffix} {chr(3)}')
+
+def showProgressBar(sec):
+    for i in range(0, sec+1):
+        sleep(1)
+        progressBar(i, sec, '    Progress', "Completed | " + str(timedelta(seconds=sec-i)) + " left")
 
 def usage():
     a = '''
@@ -23,47 +40,36 @@ By defaut:
 
     print(a)
 
-def pomodoro(time):
-    pass
-
-def breakTime(time):
-    pass
-
 def startPomodoro(time, repeat, shortBreak, longBreak, cycle):
     noti = ToastNotifier()
-    toastDuration = 25
+    toastDuration = 10
     iconPath = f'C:\\Users\\{getuser()}\\tomato.ico'
-    if not time or not repeat or not shortBreak or not longBreak or not cycle:
-        print('Something were wrong!\nMake sure not thing is less than or equal 0!!')
-        sleep(1)
-        usage()
-
-    text = f'''\n\n         New Pomodoro\n    time        :   {time/60}  min\n    repeat      :   {repeat}   times\n    short-break :   {shortBreak/60}   min\n    long-break  :   {longBreak/60}  min\n    cycle       :   {cycle}   cycles'''
-    print(text)
-    a = 1
+    if not path.isfile(iconPath):
+        iconPath=None
+    print(f'''\n\n         New Pomodoro\n    time        :   {time//60}   min\n    repeat      :   {repeat}   times\n    short-break :   {shortBreak//60}   min\n    long-break  :   {longBreak//60}   min\n    cycle       :   {cycle}   cycles\n''')
     for i in range(cycle):
-        print(f"Starting cycle {i+1}")
-        noti.show_toast("Pomodoro", f"Start cycle of: {i+1}", duration=toastDuration, icon_path=iconPath)
-        sleep(time-toastDuration)
-        if a != repeat:
-            noti.show_toast("Pomodoro", "It's time to take a short break", duration=toastDuration, icon_path=iconPath)
-            sleep(shortBreak-toastDuration)
-        else:
-            noti.show_toast("Pomodoro",f"You have finished {repeat} Pomodoros\nIt's time for a long break!!!", duration=toastDuration, icon_path=iconPath)
-            sleep(longBreak-toastDuration)
-            a = 0
-        a += 1
+        print(f"\nStarting cycle {i+1}")
+        noti.show_toast("Pomodoro", f"Starting cycle {i+1}", duration=toastDuration, icon_path=iconPath, threaded=1)
+        for j in range(repeat):
+            print(f'    Pomodoro {j+1}')
+            showProgressBar(time)
+            noti.show_toast("Pomodoro", "It's time to take a short break", duration=toastDuration, icon_path=iconPath, threaded=1)
+            print(f"    Short Break")
+            showProgressBar(shortBreak)
+        noti.show_toast("Pomodoro",f"You have finished {repeat} Pomodoros\nIt's time for a long break!!!", duration=toastDuration, icon_path=iconPath, threaded=1)
+        print(f"    Long Break")
+        showProgressBar(longBreak)
 
 def getInput():
-    print('Enter time: ', end='')
+    print('Enter time (minute)              :   ', end='')
     time=int(input())*60
-    print('Enter repeat time: ', end='')
+    print('Enter repeat time                :   ', end='')
     repeat=int(input())
-    print('Enter short break time: ', end='')
+    print('Enter short break time (minute)  :   ', end='')
     shortBreak=int(input())*60
-    print('Enter long break time: ', end='')
+    print('Enter long break time (minute)   :   ', end='')
     longBreak=int(input())*60
-    print('Enter cycle: ', end='')
+    print('Enter cycle                      :   ', end='')
     cycle=int(input())
 
     return time, repeat, shortBreak, longBreak, cycle
@@ -74,9 +80,10 @@ def main():
     shortBreak = 5*60
     longBreak = 15*60
     cycle = 3
+    isInputOK = 0
     if not(sys.argv[1:]):
         usage()
-        print("\nDo you want to use default settings? Y/N ", end='')
+        print("\nDo you want to use default settings? Yes/No ", end='')
         n=input()
         
         while n.lower() not in ('y', 'yes') and n.lower() not in ('n', 'no'):
@@ -86,6 +93,7 @@ def main():
             pass
         elif n.lower() in ('no', 'n'):
             time, repeat, shortBreak, longBreak, cycle = getInput()
+        isInputOK = 1
     else:
         try:
             opt, val = getopt.getopt(sys.argv[1:], "h:t:r:s:l:c:", ("help", "time", "repeat", "short-break", "long-break", "cycle"))
@@ -102,10 +110,21 @@ def main():
                     longBreak = int(v)*60
                 if o in ('-c', '--cycle'):
                     cycle = int(v)
+            isInputOK = 1
         except:
             usage()
+            isInputOK = 0
     
-    a = startPomodoro(time, repeat, shortBreak, longBreak, cycle)
+    if not time or not repeat or not shortBreak or not longBreak or not cycle:
+        print('\nSomething were wrong!\nMake sure not thing is less than or equal 0!!\n')
+        sleep(1)
+        print('See the usage below')
+        sleep(1.5)
+        usage()
+        isInputOK = 0
+    
+    if isInputOK:
+        startPomodoro(time, repeat, shortBreak, longBreak, cycle)
 
 if __name__ == "__main__":
     main()
