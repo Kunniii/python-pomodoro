@@ -1,9 +1,9 @@
 # python-pomodoro
-You can run this app directly by double click the *.exe file
+You can run this app directly by double click the executable file\
 Or you can run this in command line and give it some arguments
-
+```
 pomodoro -t 15 -s 5 -r 3 -l 15 -c 5
-
+```
 - Each pomodoro is 15 min
 - After each pomodoro short break is 5 min
 - Repeat each pomodoro for 3 times
