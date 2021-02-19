@@ -17,10 +17,10 @@ def progressBar (iteration, total, prefix = '', suffix = '', fill = '█'):
     if iteration == total: 
         print(toPrint + chr(3))
 
-def showProgressBar(sec):
+def showProgressBar(sec, fill):
     for i in range(0, sec+1):
         sleep(1)
-        progressBar(i, sec, 'Progress', "Completed | " + str(timedelta(seconds=sec-i)) + " left")
+        progressBar(i, sec, 'Progress', "Completed | " + str(timedelta(seconds=sec-i)) + " left", fill=fill)
 
 def usage():
     a = '''
