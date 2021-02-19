@@ -5,7 +5,16 @@ from getpass import getuser
 from os import path, system, get_terminal_size
 from datetime import timedelta
 
-def progressBar (iteration, total, prefix = '', suffix = '', fill = '█'):
+fill = '█'
+time = 30*60
+repeat = 5
+shortBreak = 5*60
+longBreak = 15*60
+cycle = 3
+isInputOK = 0
+
+def progressBar (iteration, total, prefix = '', suffix = ''):
+    global fill
     timeNow = strftime("%H:%M", localtime())
     length = int(int(get_terminal_size()[0]) - 70) ## I played around and pick this number
     printEnd = "\r"
@@ -17,10 +26,10 @@ def progressBar (iteration, total, prefix = '', suffix = '', fill = '█'):
     if iteration == total: 
         print(toPrint + chr(3))
 
-def showProgressBar(sec, fill):
+def showProgressBar(sec):
     for i in range(0, sec+1):
         sleep(1)
-        progressBar(i, sec, 'Progress', "Completed | " + str(timedelta(seconds=sec-i)) + " left", fill=fill)
+        progressBar(i, sec, 'Progress', "Completed | " + str(timedelta(seconds=sec-i)) + " left")
 
 def usage():
     a = '''
@@ -39,7 +48,8 @@ By defaut:
     repeat      :   5   times
     short-break :   5   min
     long-break  :   15  min
-    cycle       :   3   cycle'''
+    cycle       :   3   cycle
+    filling     :   █'''
 
     print(a)
 
@@ -64,6 +74,8 @@ def startPomodoro(time, repeat, shortBreak, longBreak, cycle, fill):
         showProgressBar(longBreak)
 
 def getInput():
+    global time, repeat, shortBreak, longBreak, cycle, fill
+    
     print('Enter time (minute)              :   ', end='')
     time=int(input())*60
     print('Enter repeat time                :   ', end='')
@@ -74,17 +86,13 @@ def getInput():
     longBreak=int(input())*60
     print('Enter cycle                      :   ', end='')
     cycle=int(input())
+    print('Enter filling style              :   ', end='')
+    fill=input()
 
-    return time, repeat, shortBreak, longBreak, cycle
 
 def main():
-    time = 30*60
-    repeat = 5
-    shortBreak = 5*60
-    longBreak = 15*60
-    cycle = 3
-    isInputOK = 0
-    fill = '█'
+    global time, repeat, shortBreak, longBreak, cycle, fill
+
     try:
         if sys.argv[1] in ('-y', '--yes'):
             isInputOK = 1
@@ -100,7 +108,7 @@ def main():
                 if n.lower() in ('yes', 'y'):
                     pass
                 elif n.lower() in ('no', 'n'):
-                    time, repeat, shortBreak, longBreak, cycle = getInput()
+                    getInput()
                 isInputOK = 1
             else:
                 try:
