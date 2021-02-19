@@ -43,7 +43,7 @@ By defaut:
 
 def startPomodoro(time, repeat, shortBreak, longBreak, cycle):
     noti = ToastNotifier()
-    toastDuration = 10
+    toastDuration = 5
     iconPath = f'C:\\Users\\{getuser()}\\tomato.ico'
     if not path.isfile(iconPath):
         iconPath=None
@@ -82,10 +82,10 @@ def main():
     longBreak = 15*60
     cycle = 3
     isInputOK = 0
-    try:
-        if sys.argv[1] in ('-y', '--yes'):
-            isInputOK = 1
-    except:
+    
+    if sys.argv[1] in ('-y', '--yes'):
+        isInputOK = 1
+    else:
         if not(sys.argv[1:]):
             usage()
             print("\nDo you want to use default settings? Yes/No ", end='')
