@@ -17,13 +17,15 @@ def progressBar (iteration, total, prefix = '', suffix = ''):
     global fill
     timeNow = strftime("%H:%M", localtime())
     length = int(int(get_terminal_size()[0]) - 60) ## I played around and picked this magic number
+    # print(get_terminal_size()[0])
+    # print(length)
     printEnd = "\r"
     percent = ("{0:.2f}").format(100 * (iteration / float(total)))
     filledLength = int(length * iteration // total)
     bar = fill * filledLength + ' ' * (length - filledLength)
     toPrint = f'\r    {timeNow} | {prefix} |{bar}| {percent}% {suffix}'
     print(toPrint, end = printEnd)
-    if iteration == total: 
+    if iteration == total:
         print(toPrint + ' ' + chr(3))
 
 def showProgressBar(sec):
