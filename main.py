@@ -16,7 +16,7 @@ isInputOK = 0
 def progressBar (iteration, total, prefix = '', suffix = ''):
     global fill
     timeNow = strftime("%H:%M", localtime())
-    length = int(int(get_terminal_size()[0]) - 70) ## I played around and pick this number
+    length = int(int(get_terminal_size()[0]) - 60) ## I played around and picked this magic number
     printEnd = "\r"
     percent = ("{0:.2f}").format(100 * (iteration / float(total)))
     filledLength = int(length * iteration // total)
@@ -24,7 +24,7 @@ def progressBar (iteration, total, prefix = '', suffix = ''):
     toPrint = f'\r    {timeNow} | {prefix} |{bar}| {percent}% {suffix}'
     print(toPrint, end = printEnd)
     if iteration == total: 
-        print(toPrint + chr(3))
+        print(toPrint + ' ' + chr(3))
 
 def showProgressBar(sec):
     for i in range(0, sec+1):
@@ -93,60 +93,56 @@ def getInput():
 def main():
     global time, repeat, shortBreak, longBreak, cycle, fill
 
-    try:
-        if sys.argv[1] in ('-y', '--yes'):
-            isInputOK = 1
-        else:
-            if not(sys.argv[1:]):
-                usage()
-                print("\nDo you want to use default settings? Yes/No ", end='')
-                n=input()
-                
-                while n.lower() not in ('y', 'yes') and n.lower() not in ('n', 'no'):
-                    print("Yes/No ", end='')
-                    n=input()
-                if n.lower() in ('yes', 'y'):
-                    pass
-                elif n.lower() in ('no', 'n'):
-                    getInput()
-                isInputOK = 1
-            else:
-                try:
-                    opt, val = getopt.getopt(sys.argv[1:], "h:t:r:s:l:c:f:", ("help", "time", "repeat", "short-break", "long-break", "cycle", "fill"))
-                    for o, v in opt:
-                        if o in ('-h', '--help'):
-                            usage()
-                        if o in ('-t', '--time'):
-                            time = int(v)*60
-                        if o in ('-r', '--repeat'):
-                            repeat = int(v)
-                        if o in ('-s', '--short-break'):
-                            shortBreak = int(v)*60
-                        if o in ('-l', '--long-break'):
-                            longBreak = int(v)*60
-                        if o in ('-c', '--cycle'):
-                            cycle = int(v)
-                        if o in ('-f', '--fill'):
-                            fill = v
-                    isInputOK = 1
-                except:
-                    usage()
-                    isInputOK = 0
-            
-            if not time or not repeat or not shortBreak or not longBreak or not cycle:
-                print('\nSomething were wrong!\nMake sure not thing is less than or equal 0!!\n')
-                sleep(1)
-                print('See the usage below')
-                sleep(1.5)
-                usage()
-                isInputOK = 0
-    except:
+    
+    if not(sys.argv[1:]):
         usage()
-        exit(1)
+        print("\nDo you want to use default settings? Yes/No ", end='')
+        n=input()
+        
+        while n.lower() not in ('y', 'yes') and n.lower() not in ('n', 'no'):
+            print("Yes/No ", end='')
+            n=input()
+        if n.lower() in ('yes', 'y'):
+            pass
+        elif n.lower() in ('no', 'n'):
+            getInput()
+        isInputOK = 1
+    else:
+        try:
+            opt, val = getopt.getopt(sys.argv[1:], "y:h:t:r:s:l:c:f:", ("yes", "help", "time", "repeat", "short-break", "long-break", "cycle", "fill"))
+            for o, v in opt:
+                if o in ('-y', 'yes'):
+                    break
+                if o in ('-h', '--help'):
+                    usage()
+                if o in ('-t', '--time'):
+                    time = int(v)*60
+                if o in ('-r', '--repeat'):
+                    repeat = int(v)
+                if o in ('-s', '--short-break'):
+                    shortBreak = int(v)*60
+                if o in ('-l', '--long-break'):
+                    longBreak = int(v)*60
+                if o in ('-c', '--cycle'):
+                    cycle = int(v)
+                if o in ('-f', '--fill'):
+                    fill = v[0]
+            isInputOK = 1
+        except:
+            isInputOK = 0
+        
+        if not time or not repeat or not shortBreak or not longBreak or not cycle:
+            print('\nSomething were wrong!\nMake sure not thing is less than or equal 0!!\n')
+            sleep(1)
+            print('See the usage below')
+            sleep(1.5)
+            isInputOK = 0
     
     if isInputOK:
         system('cls')
         startPomodoro(time, repeat, shortBreak, longBreak, cycle, fill)
+    else:
+        usage()
 
 if __name__ == "__main__":
     main()
