@@ -65,12 +65,14 @@ def startPomodoro(time, repeat, shortBreak, longBreak, cycle, fill):
     for i in range(cycle):
         print(f'\nStarting cycle {i+1}')
         noti.show_toast("Pomodoro", f"Starting cycle {i+1}", duration=toastDuration, icon_path=iconPath, threaded=1)
-        for j in range(repeat):
+        for j in range(repeat-1):
             print(f'    Pomodoro {j+1}')
             showProgressBar(time)
             noti.show_toast("Pomodoro", "It's time to take a short break", duration=toastDuration, icon_path=iconPath, threaded=1)
             print(f"    Short Break")
             showProgressBar(shortBreak)
+        print(f'    Pomodoro {repeat+1}')
+        showProgressBar(time)
         noti.show_toast("Pomodoro",f"You have finished {repeat} Pomodoros\nIt's time for a long break!!!", duration=toastDuration, icon_path=iconPath, threaded=1)
         print(f"    Long Break")
         showProgressBar(longBreak)
