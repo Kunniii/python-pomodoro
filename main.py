@@ -16,24 +16,28 @@ cycle = 3
 isInputOK = 0
 
 
-def progressBar(iteration, total, prefix="", suffix=""):
+def clearConsole():
+    if platform.system() == "Windows":
+        system("cls")
+    else:
+        system("clear")
+
+
+def progressBar(iteration, total, prefix="", suffix="", pomodoro=0, cycle=0):
     global fill
+    clearConsole()
     timeNow = strftime("%H:%M", localtime())
-    length = int(int(get_terminal_size()[0]) - 60)
-    # I played around and picked this magic number
-    # print(get_terminal_size()[0])
-    # print(length)
-    printEnd = "\r"
+    length = int(int(get_terminal_size()[0]) - 80)
     percent = ("{0:.2f}").format(100 * (iteration / float(total)))
     filledLength = int(length * iteration // total)
     bar = fill * filledLength + " " * (length - filledLength)
-    toPrint = f"\r    {timeNow} | {prefix} |{bar}| {percent}% {suffix}"
-    print(toPrint, end=printEnd)
+    toPrint = f"\n\n\tPomodoro {pomodoro} - Cycle {cycle}\n\t\t{timeNow} | {prefix} |{bar}| {percent}% {suffix}"
+    print(toPrint)
     if iteration == total:
         print(toPrint + " " + chr(3))
 
 
-def showProgressBar(sec):
+def showProgressBar(sec, pomodoro, cycle):
     for i in range(0, sec + 1):
         sleep(1)
         progressBar(
@@ -41,6 +45,8 @@ def showProgressBar(sec):
             sec,
             "Progress",
             "Completed | " + str(timedelta(seconds=sec - i)) + " left",
+            pomodoro, 
+            cycle
         )
 
 
@@ -69,17 +75,17 @@ By default:
 
 
 def startPomodoro(time, repeat, shortBreak, longBreak, cycle, fill):
-    toastDuration = 5
     iconPath = path.abspath("./tomato.ico")
     if not path.isfile(iconPath):
         iconPath = None
-    print("\n\n         New Pomodoro")
-    print(f"    time        :   {time//60}   min")
-    print(f"    repeat      :   {repeat}   times")
-    print(f"    short-break :   {shortBreak//60}   min")
-    print(f"    long-break  :   {longBreak//60}   min")
-    print(f"    cycle       :   {cycle}   cycles")
-
+    print("\n\n\t\tNew Pomodoro")
+    print(f"\ttime        :   {time//60}   min")
+    print(f"\trepeat      :   {repeat}   times")
+    print(f"\tshort-break :   {shortBreak//60}   min")
+    print(f"\tlong-break  :   {longBreak//60}   min")
+    print(f"\tcycle       :   {cycle}   cycles")
+    print(f"\n\n>> Starting in 3 senconds...")
+    sleep(3)
     notify = Notify(
         default_notification_audio=path.abspath("./bell.wav"),
     )
@@ -90,18 +96,15 @@ def startPomodoro(time, repeat, shortBreak, longBreak, cycle, fill):
     for i in range(cycle):
         print(f"\nStarting cycle {i+1}")
         notify.message = f"Starting cycle {i+1}"
-        notify.send(block=False)
         for j in range(repeat - 1):
-            print(f"    Pomodoro {j+1}")
-            showProgressBar(time)
+            notify.send(block=False)
+            showProgressBar(time, j+1, i+1)
 
             notify.title = "Pomodoro short break"
-            notify.message = f"It's time to take a short break"
+            notify.message = "It's time to take a short break"
             notify.send(block=False)
 
-            print(f"    Short Break")
-            showProgressBar(shortBreak)
-        print(f"    Pomodoro {repeat+1}")
+            showProgressBar(shortBreak, "Short break", i+1)
         showProgressBar(time)
 
         notify.title = "Pomodoro long break"
@@ -110,8 +113,7 @@ def startPomodoro(time, repeat, shortBreak, longBreak, cycle, fill):
         )
         notify.send(block=False)
 
-        print(f"    Long Break")
-        showProgressBar(longBreak)
+        showProgressBar(longBreak, "Long break", i+1)
 
 
 def getInput():
@@ -181,7 +183,7 @@ def main():
                 if o in ("-f", "--fill"):
                     fill = v[0]
             isInputOK = 1
-        except:
+        except Exception:
             isInputOK = 0
 
         if not time or not repeat or not shortBreak or not longBreak or not cycle:
@@ -194,16 +196,14 @@ def main():
             isInputOK = 0
 
     if isInputOK:
-        # check OS type linux or windows
-        if platform.system() == "Windows":
-            system("cls")
-        else:
-            system("clear")
-
+        clearConsole()
         startPomodoro(time, repeat, shortBreak, longBreak, cycle, fill)
     else:
         usage()
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except KeyboardInterrupt:
+        print("\n\nHave a good day!!\n\n")
