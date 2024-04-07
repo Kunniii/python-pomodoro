@@ -43,7 +43,7 @@ def showProgressBar(sec, pomodoro, cycle):
         progressBar(
             i,
             sec,
-            "Progress",
+            "Running",
             "Completed | " + str(timedelta(seconds=sec - i)) + " left",
             pomodoro, 
             cycle
